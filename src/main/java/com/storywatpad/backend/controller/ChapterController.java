@@ -1,0 +1,41 @@
+package com.storywatpad.backend.controller;
+
+import com.storywatpad.backend.model.Chapter;
+import com.storywatpad.backend.repository.ChapterRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/chapters")
+public class ChapterController {
+
+    @Autowired
+    private ChapterRepository chapterRepository;
+
+    @GetMapping
+    public List<Chapter> getAllChapters() {
+        return chapterRepository.findAll();
+    }
+
+    @PostMapping
+    public Chapter createChapter(@RequestBody Chapter chapter) {
+        return chapterRepository.save(chapter);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteChapter(@PathVariable Long id) {
+        chapterRepository.deleteById(id);
+    }
+    @PutMapping("/{id}")
+    public Chapter updateChapter(@PathVariable Long id, @RequestBody Chapter updatedChapter) {
+        return chapterRepository.findById(id).map(chapter -> {
+            chapter.setTitle(updatedChapter.getTitle());
+            chapter.setContent(updatedChapter.getContent());
+            chapter.setUpdatedAt(updatedChapter.getUpdatedAt());
+            return chapterRepository.save(chapter);
+        }).orElseThrow(() -> new RuntimeException("Chapter not found"));
+    }
+
+}

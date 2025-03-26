@@ -1,0 +1,40 @@
+package com.storywatpad.backend.controller;
+
+import com.storywatpad.backend.model.Comment;
+import com.storywatpad.backend.repository.CommentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/comments")
+public class CommentController {
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @GetMapping
+    public List<Comment> getAllComments() {
+        return commentRepository.findAll();
+    }
+
+    @PostMapping
+    public Comment createComment(@RequestBody Comment comment) {
+        return commentRepository.save(comment);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable Long id) {
+        commentRepository.deleteById(id);
+    }
+    @PutMapping("/{id}")
+    public Comment updateComment(@PathVariable Long id, @RequestBody Comment updatedComment) {
+        return commentRepository.findById(id).map(comment -> {
+            comment.setContent(updatedComment.getContent());
+            comment.setUpdatedAt(updatedComment.getUpdatedAt());
+            return commentRepository.save(comment);
+        }).orElseThrow(() -> new RuntimeException("Comment not found"));
+    }
+
+}

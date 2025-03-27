@@ -1,6 +1,7 @@
 package com.storywatpad.backend.controller;
 
 import com.storywatpad.backend.model.Chapter;
+import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,11 @@ public class ChapterController {
     @GetMapping
     public List<Chapter> getAllChapters() {
         return chapterRepository.findAll();
+    }
+    @GetMapping("/{id}")
+    public Chapter getChapterById(@PathVariable Long id) {
+        return chapterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @PostMapping

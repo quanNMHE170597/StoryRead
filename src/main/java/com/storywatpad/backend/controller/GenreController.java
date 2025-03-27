@@ -1,6 +1,7 @@
 package com.storywatpad.backend.controller;
 
 import com.storywatpad.backend.model.Genre;
+import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,11 @@ public class GenreController {
     @GetMapping
     public List<Genre> getAllGenres() {
         return genreRepository.findAll();
+    }
+    @GetMapping("/{id}")
+    public Genre getUserById(@PathVariable Long id) {
+        return genreRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @PostMapping

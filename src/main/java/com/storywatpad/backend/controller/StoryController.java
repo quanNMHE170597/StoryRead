@@ -1,6 +1,7 @@
 package com.storywatpad.backend.controller;
 
 import com.storywatpad.backend.model.Story;
+import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.StoryRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,11 @@ public class StoryController {
     @GetMapping("/hot")
     public List<Story> getHotStories() {
         return storyRepository.findTop5ByIsHiddenFalseOrderByCreatedAtDesc(); // hoặc tùy cách bạn lọc hot story
+    }
+    @GetMapping("/{id}")
+    public Story getStoryById(@PathVariable Long id) {
+        return storyRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 }

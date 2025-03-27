@@ -1,6 +1,7 @@
 package com.storywatpad.backend.controller;
 
 import com.storywatpad.backend.model.Comment;
+import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,11 @@ public class CommentController {
     @GetMapping
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
+    }
+    @GetMapping("/{id}")
+    public Comment getCommentById(@PathVariable Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @PostMapping

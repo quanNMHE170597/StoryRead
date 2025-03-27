@@ -1,21 +1,31 @@
 package com.storywatpad.backend.controller;
 
 import com.storywatpad.backend.model.Chapter;
+import com.storywatpad.backend.model.ReadingHistory;
+import com.storywatpad.backend.model.ReadingHistoryId;
 import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.ChapterRepository;
+import com.storywatpad.backend.repository.ReadingHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/chapters")
 public class ChapterController {
+    @Autowired
 
     private final ChapterRepository chapterRepository;
+    @Autowired
+    private final ReadingHistoryRepository readingHistoryRepository;
 
-    public ChapterController(ChapterRepository chapterRepository) {
+    public ChapterController(ChapterRepository chapterRepository, ReadingHistoryRepository readingHistoryRepository) {
         this.chapterRepository = chapterRepository;
+        this.readingHistoryRepository = readingHistoryRepository;
     }
 
     @GetMapping
@@ -27,6 +37,34 @@ public class ChapterController {
         return chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    @GetMapping("/previous/{storyId}/{chapterId}")
+    public Chapter getPreviousChapter(@PathVariable Long storyId, @PathVariable Long chapterId) {
+        return chapterRepository.findPreviousChapter(storyId, chapterId)
+                .orElseThrow(() -> new RuntimeException("No previous chapter found"));
+    }
+    @PutMapping("/like/{storyId}/{chapterId}")
+    public ResponseEntity<Void> toggleLike(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId, @RequestParam boolean likeStatus) {
+        Optional<ReadingHistory> readingHistory = readingHistoryRepository.findById(new ReadingHistoryId(userId, storyId, chapterId));
+
+        if (readingHistory.isPresent()) {
+            ReadingHistory history = readingHistory.get();
+            history.setLike(likeStatus ? 1 : 0);
+            readingHistoryRepository.save(history);
+        } else {
+            // Nếu không có ReadingHistory, tạo mới
+            ReadingHistory history = new ReadingHistory(userId, storyId, chapterId, likeStatus ? 1 : 0, 0, LocalDateTime.now());
+            readingHistoryRepository.save(history);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/next/{storyId}/{chapterId}")
+    public Chapter getNextChapter(@PathVariable Long storyId, @PathVariable Long chapterId) {
+        return chapterRepository.findNextChapter(storyId, chapterId)
+                .orElseThrow(() -> new RuntimeException("No next chapter found"));
+    }
+
 
     @PostMapping
     public Chapter createChapter(@RequestBody Chapter chapter) {
@@ -49,6 +87,11 @@ public class ChapterController {
     @GetMapping("/story/{storyId}")
     public List<Chapter> getChaptersByStoryId(@PathVariable Long storyId) {
         return chapterRepository.findByStoryIdOrderByChapterIdAsc(storyId);
+    }
+    @GetMapping("/first/{storyId}")
+    public Chapter getFirstChapterByStoryId(@PathVariable Long storyId) {
+        Optional<Chapter> firstChapter = chapterRepository.findFirstByStoryIdOrderByCreatedAtAsc(storyId);
+        return firstChapter.orElseThrow(() -> new RuntimeException("No chapters found for story ID: " + storyId));
     }
 
 }

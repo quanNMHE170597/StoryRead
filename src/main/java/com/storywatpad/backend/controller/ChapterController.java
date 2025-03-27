@@ -5,6 +5,7 @@ import com.storywatpad.backend.model.ReadingHistory;
 import com.storywatpad.backend.model.ReadingHistoryId;
 import com.storywatpad.backend.model.User;
 import com.storywatpad.backend.repository.ChapterRepository;
+import com.storywatpad.backend.repository.CommentRepository;
 import com.storywatpad.backend.repository.ReadingHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,13 @@ public class ChapterController {
     private final ChapterRepository chapterRepository;
     @Autowired
     private final ReadingHistoryRepository readingHistoryRepository;
+    @Autowired
+    private final CommentRepository commentRepository;
 
-    public ChapterController(ChapterRepository chapterRepository, ReadingHistoryRepository readingHistoryRepository) {
+    public ChapterController(ChapterRepository chapterRepository, ReadingHistoryRepository readingHistoryRepository, CommentRepository commentRepository) {
         this.chapterRepository = chapterRepository;
         this.readingHistoryRepository = readingHistoryRepository;
+        this.commentRepository = commentRepository;
     }
 
     @GetMapping
@@ -64,6 +68,28 @@ public class ChapterController {
         return chapterRepository.findNextChapter(storyId, chapterId)
                 .orElseThrow(() -> new RuntimeException("No next chapter found"));
     }
+    @GetMapping("/{storyId}/{chapterId}/views")
+    public int getChapterViewCount(@PathVariable Long storyId, @PathVariable Long chapterId) {
+        return readingHistoryRepository.getChapterViewCount(storyId, chapterId);
+    }
+
+    @GetMapping("/{storyId}/{chapterId}/likes")
+    public int getChapterLikeCount(@PathVariable Long storyId, @PathVariable Long chapterId) {
+        return readingHistoryRepository.getChapterLikeCount(storyId, chapterId);
+    }
+    @GetMapping("/{storyId}/{chapterId}/liked")
+    public boolean isChapterLiked(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId) {
+        return readingHistoryRepository.isChapterLiked(storyId, chapterId, userId);
+    }
+    @GetMapping("/{storyId}/{chapterId}/comments")
+    public int getCommentCount(@PathVariable Long storyId, @PathVariable Long chapterId) {
+        return commentRepository.getCommentCount(storyId, chapterId);
+    }
+    @PutMapping("/{storyId}/{chapterId}/like")
+    public void updateLikeStatus(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId, @RequestParam boolean isLiked) {
+        readingHistoryRepository.updateLikeStatus(storyId, chapterId, userId, isLiked);
+    }
+
 
 
     @PostMapping

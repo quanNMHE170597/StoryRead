@@ -22,4 +22,5 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     Optional<Chapter> findPreviousChapter(@Param("storyId") Long storyId, @Param("chapterId") Long chapterId);
 
 
+
 }

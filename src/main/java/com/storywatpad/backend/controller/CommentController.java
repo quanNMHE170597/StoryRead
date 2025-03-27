@@ -63,6 +63,22 @@ public class CommentController {
             );
         }).collect(Collectors.toList());
     }
+    @GetMapping("/replies/{commentId}")
+    public List<CommentResponseDTO> getRepliesForComment(@PathVariable Long commentId) {
+        List<Comment> comments = commentRepository.findByParentCommentId(commentId);
+        return comments.stream().map(comment -> {
+            User user = userRepository.findById(comment.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            return new CommentResponseDTO(
+                    comment.getCommentId(),
+                    comment.getUserId(),
+                    user.getUsername(),
+                    comment.getStoryId(),
+                    comment.getContent(),
+                    comment.getParentCommentId()
+            );
+        }).collect(Collectors.toList());
+    }
 
 
 

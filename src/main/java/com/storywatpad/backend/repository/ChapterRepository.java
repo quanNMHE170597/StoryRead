@@ -10,4 +10,6 @@ import java.util.List;
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     List<Chapter> findByStoryId(Long storyId);
     int countByStoryId(Long storyId);
+    List<Chapter> findByStoryIdOrderByChapterIdAsc(Long storyId);
+
 }

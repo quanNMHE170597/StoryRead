@@ -12,8 +12,11 @@ import java.util.List;
 @RequestMapping("/api/chapters")
 public class ChapterController {
 
-    @Autowired
-    private ChapterRepository chapterRepository;
+    private final ChapterRepository chapterRepository;
+
+    public ChapterController(ChapterRepository chapterRepository) {
+        this.chapterRepository = chapterRepository;
+    }
 
     @GetMapping
     public List<Chapter> getAllChapters() {
@@ -23,10 +26,6 @@ public class ChapterController {
     public Chapter getChapterById(@PathVariable Long id) {
         return chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    }
-    @GetMapping("/story/{storyId}")
-    public List<Chapter> getChaptersByStoryId(@PathVariable Long storyId) {
-        return chapterRepository.findByStoryId(storyId);
     }
 
     @PostMapping
@@ -46,6 +45,10 @@ public class ChapterController {
             chapter.setUpdatedAt(updatedChapter.getUpdatedAt());
             return chapterRepository.save(chapter);
         }).orElseThrow(() -> new RuntimeException("Chapter not found"));
+    }
+    @GetMapping("/story/{storyId}")
+    public List<Chapter> getChaptersByStoryId(@PathVariable Long storyId) {
+        return chapterRepository.findByStoryIdOrderByChapterIdAsc(storyId);
     }
 
 }

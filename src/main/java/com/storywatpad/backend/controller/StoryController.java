@@ -21,6 +21,7 @@ public class StoryController {
     private final ChapterRepository chapterRepository;
     private final UserRepository userRepository;
 
+
     public StoryController(StoryRepository storyRepository,
                            ReadingHistoryRepository readingHistoryRepository,
                            ChapterRepository chapterRepository,

@@ -42,5 +42,10 @@ public class CommentController {
             return commentRepository.save(comment);
         }).orElseThrow(() -> new RuntimeException("Comment not found"));
     }
+    @GetMapping("/story/{storyId}")
+    public List<Comment> getCommentsByStoryId(@PathVariable Long storyId) {
+        return commentRepository.findByStoryId(storyId);
+    }
+
 
 }

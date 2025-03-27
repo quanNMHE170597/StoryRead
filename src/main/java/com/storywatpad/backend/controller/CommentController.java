@@ -17,6 +17,7 @@ public class CommentController {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping

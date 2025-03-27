@@ -23,6 +23,12 @@ public class UserController {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    @GetMapping("/story/{storyId}")
+    public User getAuthorByStoryId(@PathVariable Long storyId) {
+        return userRepository.findByStoryId(storyId)
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+    }
+
 
 
     @PostMapping

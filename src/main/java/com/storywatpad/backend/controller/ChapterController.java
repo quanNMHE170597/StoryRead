@@ -24,6 +24,10 @@ public class ChapterController {
         return chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    @GetMapping("/story/{storyId}")
+    public List<Chapter> getChaptersByStoryId(@PathVariable Long storyId) {
+        return chapterRepository.findByStoryId(storyId);
+    }
 
     @PostMapping
     public Chapter createChapter(@RequestBody Chapter chapter) {

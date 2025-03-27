@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, ReadingHistoryId> {
+    int countByStoryId(Long storyId);
+    int countByStoryIdAndLike(Long storyId, int like);
+
 }

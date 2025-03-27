@@ -3,11 +3,14 @@ package com.storywatpad.backend.controller;
 import com.storywatpad.backend.model.Chapter;
 import com.storywatpad.backend.model.ReadingHistory;
 import com.storywatpad.backend.model.ReadingHistoryId;
+import com.storywatpad.backend.model.Story;
 import com.storywatpad.backend.repository.ReadingHistoryRepository;
+import com.storywatpad.backend.repository.StoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,6 +19,7 @@ import java.util.List;
 public class ReadingHistoryController {
 
     private final ReadingHistoryRepository readingHistoryRepository;
+    private final StoryRepository storyRepository;
 
     @GetMapping
     public List<ReadingHistory> getAll() {
@@ -55,5 +59,22 @@ public class ReadingHistoryController {
             return new Chapter(history.getStoryId(), history.getChapterId(), null, null, null, null); // Bạn có thể bổ sung thêm thông tin chapter nếu cần
         }
         return null; // Nếu không tìm thấy chapter nào
+    }
+    // Lấy danh sách truyện đã đọc của người dùng
+    @GetMapping("/user/{userId}")
+    public List<Story> getUserHistory(@PathVariable Long userId) {
+        // Lấy danh sách ReadingHistory của userId
+        List<ReadingHistory> historyList = readingHistoryRepository.findByUserId(userId);
+
+        // Duyệt qua các history và lấy danh sách truyện
+        List<Story> stories = new ArrayList<>();
+        for (ReadingHistory history : historyList) {
+            Story story = storyRepository.findById(history.getStoryId()).orElse(null);
+            if (story != null) {
+                stories.add(story);
+            }
+        }
+
+        return stories;
     }
 }

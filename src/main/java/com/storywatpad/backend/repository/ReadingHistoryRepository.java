@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, ReadingHistoryId> {
     int countByStoryId(Long storyId);
@@ -27,4 +29,6 @@ public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, 
     void updateLikeStatus(@Param("storyId") Long storyId, @Param("chapterId") Long chapterId, @Param("userId") Long userId, @Param("isLiked") boolean isLiked);
 
     ReadingHistory findTopByStoryIdAndUserIdOrderByLastReadAtDesc(Long storyId, Long userId);
+
+    List<ReadingHistory> findByUserId(Long userId);
 }

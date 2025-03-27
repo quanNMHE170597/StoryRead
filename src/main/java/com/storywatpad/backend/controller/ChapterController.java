@@ -46,22 +46,28 @@ public class ChapterController {
         return chapterRepository.findPreviousChapter(storyId, chapterId)
                 .orElseThrow(() -> new RuntimeException("No previous chapter found"));
     }
-    @PutMapping("/like/{storyId}/{chapterId}")
+    @PutMapping("/{storyId}/{chapterId}/like")
     public ResponseEntity<Void> toggleLike(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId, @RequestParam boolean likeStatus) {
-        Optional<ReadingHistory> readingHistory = readingHistoryRepository.findById(new ReadingHistoryId(userId, storyId, chapterId));
+        try {
+            Optional<ReadingHistory> readingHistory = readingHistoryRepository.findById(new ReadingHistoryId(userId, storyId, chapterId));
 
-        if (readingHistory.isPresent()) {
-            ReadingHistory history = readingHistory.get();
-            history.setLike(likeStatus ? 1 : 0);
-            readingHistoryRepository.save(history);
-        } else {
-            // Nếu không có ReadingHistory, tạo mới
-            ReadingHistory history = new ReadingHistory(userId, storyId, chapterId, likeStatus ? 1 : 0, 0, LocalDateTime.now());
-            readingHistoryRepository.save(history);
+            if (readingHistory.isPresent()) {
+                ReadingHistory history = readingHistory.get();
+                history.setLike(likeStatus ? 1 : 0);
+                readingHistoryRepository.save(history);
+            } else {
+                // Nếu không có ReadingHistory, tạo mới
+                ReadingHistory history = new ReadingHistory(userId, storyId, chapterId, likeStatus ? 1 : 0, 0, LocalDateTime.now());
+                readingHistoryRepository.save(history);
+            }
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            // Log exception để biết chi tiết lỗi
+            e.printStackTrace();
+            return ResponseEntity.status(500).build(); // Trả về lỗi server 500
         }
-
-        return ResponseEntity.ok().build();
     }
+    
 
     @GetMapping("/next/{storyId}/{chapterId}")
     public Chapter getNextChapter(@PathVariable Long storyId, @PathVariable Long chapterId) {
@@ -95,10 +101,6 @@ public class ChapterController {
     @GetMapping("/{storyId}/{chapterId}/comments")
     public int getCommentCount(@PathVariable Long storyId, @PathVariable Long chapterId) {
         return commentRepository.getCommentCount(storyId, chapterId);
-    }
-    @PutMapping("/{storyId}/{chapterId}/like")
-    public void updateLikeStatus(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId, @RequestParam boolean isLiked) {
-        readingHistoryRepository.updateLikeStatus(storyId, chapterId, userId, isLiked);
     }
 
 

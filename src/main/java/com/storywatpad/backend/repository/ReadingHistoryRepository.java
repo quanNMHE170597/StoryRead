@@ -20,8 +20,8 @@ public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, 
     int getChapterLikeCount(@Param("storyId") Long storyId, @Param("chapterId") Long chapterId);
 
     @Query("SELECT r.like FROM ReadingHistory r WHERE r.userId = :userId AND r.storyId = :storyId AND r.chapterId = :chapterId")
-    Boolean isChapterLiked(@Param("userId") Long userId, @Param("storyId") Long storyId, @Param("chapterId") Long chapterId);
-
+    Integer isChapterLiked(@Param("userId") Long userId, @Param("storyId") Long storyId, @Param("chapterId") Long chapterId);
+    
     @Modifying
     @Query("UPDATE ReadingHistory r SET r.like = :isLiked WHERE r.userId = :userId AND r.storyId = :storyId AND r.chapterId = :chapterId")
     void updateLikeStatus(@Param("storyId") Long storyId, @Param("chapterId") Long chapterId, @Param("userId") Long userId, @Param("isLiked") boolean isLiked);

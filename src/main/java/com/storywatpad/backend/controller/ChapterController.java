@@ -79,8 +79,19 @@ public class ChapterController {
     }
     @GetMapping("/{storyId}/{chapterId}/liked")
     public boolean isChapterLiked(@PathVariable Long storyId, @PathVariable Long chapterId, @RequestParam Long userId) {
-        return readingHistoryRepository.isChapterLiked(storyId, chapterId, userId);
+        Integer likeStatus = readingHistoryRepository.isChapterLiked(userId, storyId, chapterId);
+
+        // Nếu không có kết quả, tức là chưa có bản ghi, ta trả về false
+        if (likeStatus == null || likeStatus == 0) {
+            return false; // Giả sử nếu không có like thì mặc định là false
+        }
+
+        return likeStatus == 1; // Trả về true nếu likeStatus là 1, false nếu là 0
     }
+
+
+
+
     @GetMapping("/{storyId}/{chapterId}/comments")
     public int getCommentCount(@PathVariable Long storyId, @PathVariable Long chapterId) {
         return commentRepository.getCommentCount(storyId, chapterId);

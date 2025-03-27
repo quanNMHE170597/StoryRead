@@ -1,5 +1,6 @@
 package com.storywatpad.backend.controller;
 
+import com.storywatpad.backend.model.Chapter;
 import com.storywatpad.backend.model.ReadingHistory;
 import com.storywatpad.backend.model.ReadingHistoryId;
 import com.storywatpad.backend.repository.ReadingHistoryRepository;
@@ -42,5 +43,17 @@ public class ReadingHistoryController {
 
         readingHistoryRepository.save(history);
     }
+    // API lấy chương gần nhất mà người dùng đã đọc (chapterNow)
+    // API để lấy chương người dùng đã đọc gần nhất cho mỗi truyện (chapterNow)
+    @GetMapping("/chapterNow/{userId}/{storyId}")
+    public Chapter getChapterNow(@PathVariable Long userId, @PathVariable Long storyId) {
+        // Tìm chapter có lastReadAt cao nhất cho userId và storyId
+        ReadingHistory history = readingHistoryRepository.findTopByStoryIdAndUserIdOrderByLastReadAtDesc(storyId, userId);
 
+        // Trả về chapter nếu tìm thấy, nếu không trả về null
+        if (history != null) {
+            return new Chapter(history.getStoryId(), history.getChapterId(), null, null, null, null); // Bạn có thể bổ sung thêm thông tin chapter nếu cần
+        }
+        return null; // Nếu không tìm thấy chapter nào
+    }
 }

@@ -67,7 +67,7 @@ public class ChapterController {
             return ResponseEntity.status(500).build(); // Trả về lỗi server 500
         }
     }
-    
+
 
     @GetMapping("/next/{storyId}/{chapterId}")
     public Chapter getNextChapter(@PathVariable Long storyId, @PathVariable Long chapterId) {

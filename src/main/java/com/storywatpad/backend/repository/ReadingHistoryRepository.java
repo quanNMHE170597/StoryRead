@@ -26,4 +26,5 @@ public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, 
     @Query("UPDATE ReadingHistory r SET r.like = :isLiked WHERE r.userId = :userId AND r.storyId = :storyId AND r.chapterId = :chapterId")
     void updateLikeStatus(@Param("storyId") Long storyId, @Param("chapterId") Long chapterId, @Param("userId") Long userId, @Param("isLiked") boolean isLiked);
 
+    ReadingHistory findTopByStoryIdAndUserIdOrderByLastReadAtDesc(Long storyId, Long userId);
 }

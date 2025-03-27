@@ -70,4 +70,5 @@ public class StoryController {
         return userRepository.findById(story.getAuthorId())
                 .orElseThrow(() -> new RuntimeException("Author not found"));
     }
+
 }

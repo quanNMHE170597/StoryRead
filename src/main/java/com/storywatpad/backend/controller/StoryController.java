@@ -27,7 +27,7 @@ public class StoryController {
     }
     @GetMapping("/{id}")
     public Story getStoryById(@PathVariable Long id) {
-        return storyRepository.findById(Math.toIntExact(id))
+        return storyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Story not found"));
     }
 

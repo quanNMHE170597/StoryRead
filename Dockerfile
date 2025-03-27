@@ -1,11 +1,18 @@
-# Dùng image Java 17
-FROM openjdk:17-jdk-slim
+# Dùng image Maven + JDK để build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Tạo thư mục làm việc trong container
+WORKDIR /app
+COPY . .
+
+# Build ứng dụng Spring Boot (tạo file jar)
+RUN mvn clean package -DskipTests
+
+# Stage 2: dùng image nhỏ để chạy jar
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-# Copy file jar build sẵn vào container
-COPY target/*.jar app.jar
+# Copy file jar từ stage build sang stage run
+COPY --from=build /app/target/*.jar app.jar
 
-# Chạy ứng dụng Spring Boot
+# Chạy ứng dụng
 CMD ["java", "-jar", "app.jar"]

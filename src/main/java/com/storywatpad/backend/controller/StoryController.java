@@ -28,7 +28,7 @@ public class StoryController {
     @GetMapping("/{id}")
     public Story getStoryById(@PathVariable Long id) {
         return storyRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Story not found"));
     }
 
 }

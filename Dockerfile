@@ -1,11 +1,11 @@
 # Dùng image Java 17
 FROM openjdk:17-jdk-slim
 
-# Thư mục làm việc trong container
+# Tạo thư mục làm việc trong container
 WORKDIR /app
 
-# Copy file jar đã build vào container
+# Copy file jar build sẵn vào container
 COPY target/*.jar app.jar
 
-# Chạy app Spring Boot
+# Chạy ứng dụng Spring Boot
 CMD ["java", "-jar", "app.jar"]

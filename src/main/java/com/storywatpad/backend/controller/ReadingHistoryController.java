@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reading-history")
@@ -68,18 +70,32 @@ public class ReadingHistoryController {
     }
 
     // Lấy danh sách truyện đã đọc của người dùng
-    @GetMapping("/user/{userId}/{storyId}")
-    public Story getUserHistory(@PathVariable Long userId, @PathVariable Long storyId) {
-        // Lấy ReadingHistory cho userId và storyId và sắp xếp theo lastReadAt giảm dần (muộn nhất)
-        ReadingHistory history = readingHistoryRepository
-                .findTopByStoryIdAndUserIdOrderByLastReadAtDesc(storyId, userId);
+    @GetMapping("/user/{userId}")
+    public List<Story> getUserHistory(@PathVariable Long userId) {
+        // Lấy tất cả ReadingHistory của userId
+        List<ReadingHistory> historyList = readingHistoryRepository.findByUserId(userId);
 
-        // Nếu tìm thấy history, trả về story tương ứng
-        if (history != null) {
-            Story story = storyRepository.findById(history.getStoryId()).orElse(null);
-            return story;  // Trả về 1 story duy nhất
+        // Duyệt qua danh sách ReadingHistory và tìm ra chapter mới nhất cho mỗi storyId
+        Map<Long, ReadingHistory> latestHistoryMap = new HashMap<>();
+
+        for (ReadingHistory history : historyList) {
+            Long storyId = history.getStoryId();
+            if (!latestHistoryMap.containsKey(storyId) || latestHistoryMap.get(storyId).getLastReadAt().isBefore(history.getLastReadAt())) {
+                latestHistoryMap.put(storyId, history);  // Cập nhật chapter mới nhất cho mỗi storyId
+            }
         }
-        return null;  // Nếu không tìm thấy, trả về null
+
+        // Tạo danh sách các story tương ứng với chapter mới nhất
+        List<Story> stories = new ArrayList<>();
+        for (ReadingHistory latestHistory : latestHistoryMap.values()) {
+            Story story = storyRepository.findById(latestHistory.getStoryId()).orElse(null);
+            if (story != null) {
+                stories.add(story);
+            }
+        }
+
+        return stories;  // Trả về danh sách các story
     }
+
 
 }

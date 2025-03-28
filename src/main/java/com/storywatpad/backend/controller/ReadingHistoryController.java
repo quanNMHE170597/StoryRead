@@ -68,20 +68,18 @@ public class ReadingHistoryController {
     }
 
     // Lấy danh sách truyện đã đọc của người dùng
-    @GetMapping("/user/{userId}")
-    public List<Story> getUserHistory(@PathVariable Long userId) {
-        // Lấy danh sách ReadingHistory của userId
-        List<ReadingHistory> historyList = readingHistoryRepository.findByUserId(userId);
+    @GetMapping("/user/{userId}/{storyId}")
+    public Story getUserHistory(@PathVariable Long userId, @PathVariable Long storyId) {
+        // Lấy ReadingHistory cho userId và storyId và sắp xếp theo lastReadAt giảm dần (muộn nhất)
+        ReadingHistory history = readingHistoryRepository
+                .findTopByStoryIdAndUserIdOrderByLastReadAtDesc(storyId, userId);
 
-        // Duyệt qua các history và lấy danh sách truyện
-        List<Story> stories = new ArrayList<>();
-        for (ReadingHistory history : historyList) {
+        // Nếu tìm thấy history, trả về story tương ứng
+        if (history != null) {
             Story story = storyRepository.findById(history.getStoryId()).orElse(null);
-            if (story != null) {
-                stories.add(story);
-            }
+            return story;  // Trả về 1 story duy nhất
         }
-
-        return stories;
+        return null;  // Nếu không tìm thấy, trả về null
     }
+
 }

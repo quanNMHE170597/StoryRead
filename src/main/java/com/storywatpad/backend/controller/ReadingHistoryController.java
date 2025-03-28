@@ -33,33 +33,40 @@ public class ReadingHistoryController {
     // API để cập nhật ReadingHistory (View +1)
     @PutMapping("/update/{userId}/{storyId}/{chapterId}")
     public void updateReadingHistory(@PathVariable Long userId, @PathVariable Long storyId, @PathVariable Long chapterId) {
-        ReadingHistory history = readingHistoryRepository.findById(new ReadingHistoryId(userId, storyId, chapterId))
-                .orElse(null);
+        ReadingHistory history = readingHistoryRepository.findById(new ReadingHistoryId(userId, storyId, chapterId)).orElse(null);
 
         if (history != null) {
             // Nếu đã có, cập nhật View +1 và thời gian LastReadAt
             history.setView(history.getView() + 1);
             history.setLastReadAt(LocalDateTime.now());
+            readingHistoryRepository.save(history);
         } else {
             // Nếu chưa có, tạo mới ReadingHistory với View = 1
             history = new ReadingHistory(userId, storyId, chapterId, 0, 1, LocalDateTime.now());
+            readingHistoryRepository.save(history);
         }
-
-        readingHistoryRepository.save(history);
     }
     // API lấy chương gần nhất mà người dùng đã đọc (chapterNow)
     // API để lấy chương người dùng đã đọc gần nhất cho mỗi truyện (chapterNow)
     @GetMapping("/chapterNow/{userId}/{storyId}")
-    public Chapter getChapterNow(@PathVariable Long userId, @PathVariable Long storyId) {
-        // Tìm chapter có lastReadAt cao nhất cho userId và storyId
-        ReadingHistory history = readingHistoryRepository.findTopByStoryIdAndUserIdOrderByLastReadAtDesc(storyId, userId);
-
-        // Trả về chapter nếu tìm thấy, nếu không trả về null
-        if (history != null) {
-            return new Chapter(history.getStoryId(), history.getChapterId(), null, null, null, null); // Bạn có thể bổ sung thêm thông tin chapter nếu cần
+    public Chapter getChapterNow(@PathVariable Long userId, @PathVariable Long storyId,
+                                 @RequestParam(required = false) String type) {
+        if ("first".equalsIgnoreCase(type)) {
+            // Nếu type là 'first', lấy chapter đầu tiên
+            ReadingHistory history = readingHistoryRepository.findTopByStoryIdAndUserIdOrderByLastReadAtAsc(storyId, userId);
+            if (history != null) {
+                return new Chapter(history.getStoryId(), history.getChapterId(), null, null, null, null);
+            }
+        } else {
+            // Mặc định, lấy chapter gần nhất (mới nhất)
+            ReadingHistory history = readingHistoryRepository.findTopByStoryIdAndUserIdOrderByLastReadAtDesc(storyId, userId);
+            if (history != null) {
+                return new Chapter(history.getStoryId(), history.getChapterId(), null, null, null, null);
+            }
         }
         return null; // Nếu không tìm thấy chapter nào
     }
+
     // Lấy danh sách truyện đã đọc của người dùng
     @GetMapping("/user/{userId}")
     public List<Story> getUserHistory(@PathVariable Long userId) {

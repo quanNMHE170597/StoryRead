@@ -31,4 +31,6 @@ public interface ReadingHistoryRepository extends JpaRepository<ReadingHistory, 
     ReadingHistory findTopByStoryIdAndUserIdOrderByLastReadAtDesc(Long storyId, Long userId);
 
     List<ReadingHistory> findByUserId(Long userId);
+
+    ReadingHistory findTopByStoryIdAndUserIdOrderByLastReadAtAsc(Long storyId, Long userId);
 }
